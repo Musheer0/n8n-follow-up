@@ -1,0 +1,56 @@
+roadmap:
+  - time: "00:00"
+    task: "Intro & Demo"
+    done: false
+
+  - time: "01:50"
+    task: "18 Node Execution"
+    done: false
+
+  - time: "01:06:58"
+    task: "19 Node Variables"
+    done: false
+
+  - time: "01:29:53"
+    task: "20 Node Templating"
+    done: false
+
+  - time: "02:01:36"
+    task: "21 Node Realtime"
+    done: false
+
+  - time: "02:46:27"
+    task: "22 Google Form Trigger"
+    done: false
+
+  - time: "03:57:27"
+    task: "23 Stripe Trigger"
+    done: false
+
+  - time: "04:30:54"
+    task: "24 AI Nodes"
+    done: false
+
+  - time: "05:49:42"
+    task: "25 Credentials"
+    done: false
+
+  - time: "07:24:48"
+    task: "26 Discord Slack Nodes"
+    done: false
+
+  - time: "08:18:41"
+    task: "27 Executions History"
+    done: false
+
+  - time: "09:19:06"
+    task: "28 Encrypting Credentials"
+    done: false
+
+  - time: "09:31:44"
+    task: "29 GitHub Google Auth"
+    done: false
+
+  - time: "09:47:36"
+    task: "30 Deployment"
+    done: false
