@@ -1,8 +1,77 @@
 roadmap:
-  - time: "00:00"
-    task: "Intro & Demo"
+part1:
+  - time: "06:05"
+    task: "01 Setup"
     done: false
 
+  - time: "29:33"
+    task: "02 Database"
+    done: false
+
+  - time: "56:15"
+    task: "03 tRPC Setup"
+    done: false
+
+  - time: "01:35:21"
+    task: "04 Authentication"
+    done: false
+
+  - time: "02:37:24"
+    task: "05 Theme & Styling"
+    done: false
+
+  - time: "02:55:05"
+    task: "06 Background Jobs"
+    done: false
+
+  - time: "03:28:09"
+    task: "07 AI Providers"
+    done: false
+
+  - time: "04:01:53"
+    task: "08 Error Tracking"
+    done: false
+
+  - time: "04:27:54"
+    task: "09 Sidebar Layout"
+    done: false
+
+  - time: "05:06:26"
+    task: "10 Payments Setup"
+    done: false
+
+  - time: "05:44:04"
+    task: "11 Workflows Crud"
+    done: false
+
+  - time: "06:45:20"
+    task: "12 Workflows Pagination"
+    done: false
+
+  - time: "07:34:34"
+    task: "13 Workflows UI"
+    done: false
+
+  - time: "08:23:40"
+    task: "14 Workflow Page"
+    done: false
+
+  - time: "08:59:36"
+    task: "15 Editor Setup"
+    done: false
+
+  - time: "09:50:42"
+    task: "16 Node Selector"
+    done: false
+
+  - time: "10:40:32"
+    task: "17 Editor State"
+    done: false
+
+  - time: "11:59:20"
+    task: "End of Part 1"
+    done: false
+part2:
   - time: "01:50"
     task: "18 Node Execution"
     done: false
