@@ -7,7 +7,7 @@ on:
         branches:
             - main
 env:
-    DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    DATABASE_URL: "exanmplexoi4hfiohfoiuq2h4tg98oq2hftiolkq32hfoiuqhwpoi;"
 jobs:
     build:
         runs-on: ubuntu-latest
