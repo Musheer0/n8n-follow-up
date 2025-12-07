@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import db from "@/lib/db";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db,{
@@ -18,7 +19,7 @@ export const requireAuth = async()=>{
     headers:await headers()
   });
   if(!session?.user){
-    throw new Error("Unauthorized")
+    redirect("/sign-in")
   }
   return session;
 }
@@ -28,7 +29,7 @@ export const requireUnAuth = async()=>{
     headers:await headers()
   });
   if(session?.user){
-    throw new Error("Already authenticated")
+    redirect("/")
   }
   return session;
 }
