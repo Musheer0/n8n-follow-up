@@ -91,3 +91,19 @@ export const accountRelations = relations(account, ({ one }) => ({
     references: [user.id],
   }),
 }));
+export const workflow = pgTable("workflow", {
+  id: text("id").primaryKey().$defaultFn(()=>crypto.randomUUID()),
+  name: text("name").notNull(),
+  userId:text("user_id").notNull().references(()=>user.id,{onDelete:"cascade"}  ),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+export const workflowUserRelation = relations(workflow,({one})=>({
+  user:one(user,{
+    fields:[workflow.userId],
+    references:[user.id],
+  })
+}))

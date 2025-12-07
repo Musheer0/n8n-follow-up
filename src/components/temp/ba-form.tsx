@@ -28,7 +28,7 @@ const loginSchema = z.object({
 type LoginValues = z.infer<typeof loginSchema>;
 
 // ---------------- COMPONENT ----------------
-export function LoginForm() {
+export function BaForm() {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
