@@ -7,6 +7,7 @@ import { LoaderIcon, UserIcon } from 'lucide-react'
 import SidebarLinks from './sidebar-links'
 import CheckoutBtn from './polar/checkout-btn'
 import PotralBtn from './polar/potral-btn'
+import { ModeToggle } from './mode-toggle'
 
 const AppSidebar = () => {
   return (
@@ -20,6 +21,7 @@ const AppSidebar = () => {
     </SidebarHeader>
  <SidebarContent>
   <SidebarLinks/>
+ <ModeToggle/>
  </SidebarContent>
     <SidebarFooter>
       <SidebarMenu>
