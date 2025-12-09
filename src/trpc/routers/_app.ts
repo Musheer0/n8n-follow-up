@@ -3,15 +3,8 @@ import { baseProcedure, createTRPCRouter, protectedProcedure } from '../init';
 import db from '@/lib/db';
 import { workflow } from '../../../drizzle/schema';
 import {  desc } from 'drizzle-orm';
+import { workflowRouter } from './workflows';
 export const appRouter = createTRPCRouter({
-  getWorkflows: protectedProcedure.query(async({ctx})=>{
-    const workflows = await db.query.workflow.findMany({
-      where: (workflow,{eq})=> eq(workflow.userId,ctx.auth.user.id),
-      limit:10,
-      orderBy:(workflow)=>desc(workflow.createdAt)
-    });
-    return workflows
-  }),
   createWorkflow: protectedProcedure.input(
     z.object({
       name: z.string().min(1).max(255),
@@ -22,7 +15,8 @@ export const appRouter = createTRPCRouter({
       })
       .returning();
       return newWorkflow[0];
-    })
+    }),
+    workflow:workflowRouter
 });
 // export type definition of API
 export type AppRouter = typeof appRouter;

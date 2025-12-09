@@ -12,7 +12,7 @@ const PotralBtn = () => {
     onClick={()=>authClient.customer.portal()}
     >
        <CreditCardIcon/>
-       Billing Potral
+      <p className=' group-data-[collapsible=icon]:hidden'> Billing Potral</p>
     </Button>
   )
 }
