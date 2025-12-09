@@ -20,7 +20,10 @@ if(!subscribed)
         :
         <>
           <StarIcon/>
-        Upgrade To pro
+      <p className=' group-data-[collapsible=icon]:hidden'>
+
+          Upgrade To pro
+      </p>
         </>
       }
     </Button>
