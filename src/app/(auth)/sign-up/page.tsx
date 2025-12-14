@@ -1,10 +1,11 @@
 import RegisterForm from '@/components/auth/register/register-form'
 import AuthForm from '@/components/auth/shared/auth-form'
+import { requireUnAuth } from '@/lib/auth'
 import Link from 'next/link'
 import React from 'react'
 
 const page = async() => {
-
+await requireUnAuth()
 
   return (
     <div className='w-full flex items-center justify-center h-fit'>

@@ -7,7 +7,7 @@ import CreateWorkflowModal from './create-workflow-modal'
 const WorkflowHeader = ()=> {
 
   return (
-   <div className='w-full border-b py-5 px-3 flex items-center justify-between gap-2 '>
+   <div className='w-full sticky top-0 border-b py-5 px-3 flex items-center justify-between gap-2 '>
     <SidebarTrigger/>
     <p className='text-xl font-semibold mr-auto'>Workflows</p>
   <CreateWorkflowModal>

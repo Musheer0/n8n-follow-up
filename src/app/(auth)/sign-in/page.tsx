@@ -1,11 +1,12 @@
 import LoginForm from '@/components/auth/login/login-form'
 import AuthForm from '@/components/auth/shared/auth-form'
+import { requireUnAuth } from '@/lib/auth'
 import Link from 'next/link'
 import React from 'react'
 
 const page = async() => {
 
-
+ await requireUnAuth()
   return (
     <div className='w-full flex items-center justify-center h-fit'>
     <AuthForm
