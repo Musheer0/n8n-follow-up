@@ -7,3 +7,7 @@ export const useSuspenseWorkflows = ()=>{
     const [params] = useWorkflowParams()
    return  useSuspenseQuery(trpc.workflow.getMany.queryOptions(params ) );
 }
+export const useSuspenseWorkflow = (id:string)=>{
+    const trpc = useTRPC();
+    return useSuspenseQuery(trpc.workflow.getOne.queryOptions({id}))
+}
