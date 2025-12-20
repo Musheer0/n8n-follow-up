@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index, pgEnum, json, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -106,4 +106,37 @@ export const workflowUserRelation = relations(workflow,({one})=>({
     fields:[workflow.userId],
     references:[user.id],
   })
+}))
+
+export const NodeTypeDb = pgEnum("node_type",[
+  "initial"
+])
+export type NodeTypeTs = (typeof NodeTypeDb.enumValues)[number];
+export const Node = pgTable("node",{
+    id: text("id").primaryKey().$defaultFn(()=>crypto.randomUUID()),
+    name :text("name").notNull(),
+    type:NodeTypeDb("node_type").default("initial").notNull(),
+    workflow_id:text("workflow_id").notNull().references(()=>workflow.id,{onDelete:"cascade"}),
+    position: json(),
+    data:json("{}"),
+      updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+})
+export const Connection = pgTable("connection",{
+    id: text("id").primaryKey().$defaultFn(()=>crypto.randomUUID()),
+    workflow_id:text("workflow_id").notNull().references(()=>workflow.id,{onDelete:"cascade"}),
+    fromNodeId:text("from_node_id").notNull().references(()=>Node.id,{onDelete:"cascade"}),
+    toNodeId:text("to_node_id").notNull().references(()=>Node.id,{onDelete:"cascade"}),
+    from_output:text("from_output").default("main"),
+    to_output:text("to_output").default("main"),
+      updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+},(table)=>({
+  relationIdx:uniqueIndex("relation_idx").on(
+    table.fromNodeId,table.toNodeId,table.from_output,table.to_output
+  )
 }))
