@@ -15,6 +15,13 @@
       "when": 1765088760994,
       "tag": "0001_high_brother_voodoo",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766332486543,
+      "tag": "0002_vengeful_harrier",
+      "breakpoints": true
     }
   ]
 }

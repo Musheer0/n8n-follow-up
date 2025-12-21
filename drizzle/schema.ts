@@ -109,7 +109,7 @@ export const workflowUserRelation = relations(workflow,({one})=>({
 }))
 
 export const NodeTypeDb = pgEnum("node_type",[
-  "initial"
+  "initial","manual","http"
 ])
 export type NodeTypeTs = (typeof NodeTypeDb.enumValues)[number];
 export const Node = pgTable("node",{
