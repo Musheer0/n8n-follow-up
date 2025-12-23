@@ -7,7 +7,7 @@ interface BaseTriggerNodeProps extends NodeProps {
     icon:LucideIcon|string,
     name?:string,
     descritpion?:string,
-    status?:boolean,
+    status?:NodeStatus,
     onSettings?:()=>void,
     onDoubleClick?:()=>void,
     children?:React.ReactNode
@@ -17,6 +17,7 @@ interface BaseTriggerNodeProps extends NodeProps {
 import React, { memo } from 'react'
 import { WorkflowNode } from "./workflow-node"
 import { BaseNode, BaseNodeContent } from "../base-node"
+import { NodeStatus } from "../node-status-indicator"
 
 const BaseTriggerNode:React.FC<BaseTriggerNodeProps> = memo((
     {
@@ -50,7 +51,7 @@ const handleDelete = ()=>{
     onSettings={onSettings}
     showToolbar
     >
-   <BaseNode onDoubleClick={onDoubleClick}
+   <BaseNode status={status} onDoubleClick={onDoubleClick}
    className="rounded-l-2xl relative group"
    >
    <BaseNodeContent>
