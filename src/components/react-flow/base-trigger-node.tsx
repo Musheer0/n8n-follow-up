@@ -1,6 +1,6 @@
 "use client"
 
-import { Handle, NodeProps, Position } from "@xyflow/react"
+import { Handle, NodeProps, Position, useReactFlow } from "@xyflow/react"
 import { LucideIcon } from "lucide-react"
 
 interface BaseTriggerNodeProps extends NodeProps {
@@ -30,12 +30,25 @@ const BaseTriggerNode:React.FC<BaseTriggerNodeProps> = memo((
         children
     }
 ) => {
+const {setNodes,setEdges} = useReactFlow();
+const handleDelete = ()=>{
+  setNodes((currenttNodes)=>{
+    const updated_nodes = currenttNodes.filter((n)=>n.id!==id)
+    return updated_nodes
+  });
+  setEdges((currentEdges)=>{
+    const updatedEdges = currentEdges.filter((e)=>e.source!==id && e.target!==id);
+    return updatedEdges
+  })
+}
   return (
+
     <WorkflowNode
     name={name}
     description={descritpion}
-    onDelete={()=>{}}
+    onDelete={handleDelete}
     onSettings={onSettings}
+    showToolbar
     >
    <BaseNode onDoubleClick={onDoubleClick}
    className="rounded-l-2xl relative group"

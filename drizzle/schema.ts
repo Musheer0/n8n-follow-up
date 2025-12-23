@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index, pgEnum, json, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index, pgEnum, json, uniqueIndex, jsonb } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -117,8 +117,11 @@ export const Node = pgTable("node",{
     name :text("name").notNull(),
     type:NodeTypeDb("node_type").default("initial").notNull(),
     workflow_id:text("workflow_id").notNull().references(()=>workflow.id,{onDelete:"cascade"}),
-    position: json(),
-    data:json("{}"),
+   
+  position: jsonb("position").notNull(),
+
+  // 👇 THIS is the important part
+  data: jsonb("data").notNull().default({}),
       updatedAt: timestamp("updated_at")
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())

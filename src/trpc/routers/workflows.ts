@@ -2,8 +2,8 @@ import z from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
 import db from "@/lib/db";
 import {generateSlug} from 'random-word-slugs'
-import { Node, NodeTypeDb, workflow } from "../../../drizzle/schema";
-import { and, desc, eq, ilike } from "drizzle-orm";
+import { Connection, Node, NodeTypeDb, NodeTypeTs, workflow} from "../../../drizzle/schema";
+import { and, desc, eq, ilike, sql } from "drizzle-orm";
 import { PAGINATION } from "@/config/constants";
 import { TRPCError } from "@trpc/server";
 import {Node as RNode,type Edge} from '@xyflow/react'
@@ -22,12 +22,6 @@ export const workflowRouter = createTRPCRouter({
     })
     .returning();
 
-  await tx.insert(Node).values({
-    name: "initial",
-    workflow_id: newWorkflow[0].id,
-    type: "initial",
-    position:{x:0, y:0}
-  });
   return newWorkflow
 });
 
@@ -154,5 +148,111 @@ export const workflowRouter = createTRPCRouter({
        } catch (error) {
          throw new Error("error changing name ")
        }
+    }),
+    update:protectedProcedure.input(
+        z.object(
+            {
+                id:z.string(),
+                nodes:z.array(
+                    z.object({
+                        id:z.string(),
+                        type:z.string().nullish(),
+                        position:z.object({x:z.number(),y:z.number()}),
+                        data:z.record(z.string(),z.any().optional())
+                    })
+                ),
+                edges:z.array(
+                    z.object({
+                        source:z.string(),
+                        target:z.string(),
+                        sourceHandle:z.string().nullish(),
+                        targetHandle:z.string().nullish()
+                    })
+                )
+
+            }
+        )
+    )
+    .mutation(async({ctx,input})=>{
+        const {id,nodes,edges } = input;
+        const w = await db.query.workflow.findFirst({
+            where:and(
+                eq(workflow.id,id),
+                eq(workflow.userId,ctx.auth.user.id)
+            )
+        });
+        if(!w) throw new TRPCError({
+            code:"NOT_FOUND",
+            message:"workflow not found"
+        });
+        console.log(input)
+     const insertedNodes = [];
+
+  for (const node of nodes) {
+    try {
+      const [r] = await db.insert(Node).values({
+        id: node.id,
+        workflow_id: id,
+        name: node.type || "unknown",
+        type: (node.type || "manual") as NodeTypeTs,
+        position: node.position,
+        data: node.data ?? {},
+      }).returning();
+
+      insertedNodes.push(r);
+    } catch {
+     await db.update(Node).set({
+        name: node.type || "unknown",
+        type: (node.type || "manual") as NodeTypeTs,
+        position: node.position,
+        data: node.data ?? {},
+      })
+      .where(eq(Node.id, node.id))
+  
+    }
+  }
+
+  const insertedEdges = [];
+
+  for (const edge of edges) {
+    try {
+      const [r] = await db.insert(Connection).values({
+        workflow_id: id,
+        fromNodeId: edge.source,
+        toNodeId: edge.target,
+        from_output: edge.sourceHandle || "main",
+        to_output: edge.targetHandle || "main",
+      }).returning();
+
+      insertedEdges.push(r);
+    } catch {
+      await db.update(Connection).set({
+        from_output: edge.sourceHandle || "main",
+        to_output: edge.targetHandle || "main",
+      })
+      .where(
+        and(
+          eq(Connection.workflow_id, id),
+          eq(Connection.fromNodeId, edge.source),
+          eq(Connection.toNodeId, edge.target)
+        )
+      )
+   
+
+    }
+  }
+
+  const updatedAt = new Date();
+
+  await db.update(workflow)
+    .set({ updatedAt })
+    .where(eq(workflow.id, id));
+
+  return {
+    ...w,
+    updatedAt,
+    nodes: insertedNodes,
+    edges: insertedEdges,
+  };
     })
 })

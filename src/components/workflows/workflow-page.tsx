@@ -18,10 +18,13 @@ import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge,
  } from '@xyflow/react'
 import { nodeComponents } from '@/config/node-components';
 import AddNodeButoon from '../react-flow/add-node-button';
+import { useSetAtom } from 'jotai';
+import { editorAtom } from '@/features/editor/store/atom';
 
 const Editor = ({id}:{id:string}) => {
     const {data} = useSuspenseWorkflow(id);
       const [nodes, setNodes] = useState<Node[]>(data.nodes);
+      const setEditor = useSetAtom(editorAtom)
       //@ts-ignore
   const [edges, setEdges] = useState<Edge[]>(data.edges);
    const onNodesChange = useCallback(
@@ -52,6 +55,12 @@ const Editor = ({id}:{id:string}) => {
           hideAttribution:true
         }}
         nodeTypes={nodeComponents}
+        onInit={setEditor}
+        snapGrid={[10, 10]}
+        snapToGrid
+        panOnScroll
+       
+
         >
           <Background/>
           <Controls/>
