@@ -33,6 +33,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useReactFlow } from "@xyflow/react"
+import { toast } from "sonner"
+import { TRPCError } from "@trpc/server"
+import { useUpdateNodeData } from "@/hooks/use-node"
 
 // --------------------
 // Schema (truth source)
@@ -51,14 +55,17 @@ const HttpRequestDialog = ({
   defaultEndpoint = "",
   defaultBody = "",
   method = "GET",
+  id
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   defaultEndpoint?: string
   defaultBody?: string
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
-  onSubmit?:(data:z.infer<typeof formSchema>)=>void
+  id:string
 }) => {
+  const {getNodes,setNodes} = useReactFlow();
+  const updateNode = useUpdateNodeData()
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -70,9 +77,32 @@ const HttpRequestDialog = ({
 
   const selectedMethod = form.watch("method")
 
-  function onSubmit(values: FormValues) {
-    console.log("HTTP CONFIG:", values)
-    onOpenChange(false)
+  async function onSubmit(values: FormValues) {
+
+    try {
+          if(!id) {
+      return
+    }
+ setNodes((nodes)=>{
+  return nodes.map((node)=>{
+    if(node.id===id){
+      return {
+        ...node,
+        data:values
+      }
+    }
+    return node
+  })
+ })
+  updateNode.mutate({id,data:values})
+
+    } catch (error) {
+      toast.error("something went wrong try again")
+    }
+    finally{
+onOpenChange(false)
+    }
+    
   }
 
   return (
@@ -87,6 +117,7 @@ const HttpRequestDialog = ({
 
         <Form {...form}>
           <form
+          
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-4"
           >
@@ -162,13 +193,16 @@ const HttpRequestDialog = ({
 
             <div className="flex justify-end gap-2 pt-2">
               <Button
+              disabled={updateNode.isPending}
                 type="button"
                 variant="ghost"
                 onClick={() => onOpenChange(false)}
               >
                 Cancel
               </Button>
-              <Button type="submit">Save</Button>
+              <Button disabled={updateNode.isPending} type="submit">
+                {updateNode.isPending ? "Saving":"Save"}
+              </Button>
             </div>
           </form>
         </Form>

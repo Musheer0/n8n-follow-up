@@ -117,7 +117,7 @@ export const Node = pgTable("node",{
     name :text("name").notNull(),
     type:NodeTypeDb("node_type").default("initial").notNull(),
     workflow_id:text("workflow_id").notNull().references(()=>workflow.id,{onDelete:"cascade"}),
-   
+    userId:text("userId").notNull().references(()=>user.id,{onDelete:"cascade"}),
   position: jsonb("position").notNull(),
 
   // 👇 THIS is the important part
@@ -134,6 +134,7 @@ export const Connection = pgTable("connection",{
     toNodeId:text("to_node_id").notNull().references(()=>Node.id,{onDelete:"cascade"}),
     from_output:text("from_output").default("main"),
     to_output:text("to_output").default("main"),
+    userId:text("userId").notNull().references(()=>user.id,{onDelete:"cascade"}),
       updatedAt: timestamp("updated_at")
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())

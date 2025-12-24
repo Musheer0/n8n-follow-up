@@ -197,6 +197,7 @@ export const workflowRouter = createTRPCRouter({
         type: (node.type || "manual") as NodeTypeTs,
         position: node.position,
         data: node.data ?? {},
+        userId:ctx.auth.user.id
       }).returning();
 
       insertedNodes.push(r);
@@ -222,6 +223,7 @@ export const workflowRouter = createTRPCRouter({
         toNodeId: edge.target,
         from_output: edge.sourceHandle || "main",
         to_output: edge.targetHandle || "main",
+          userId:ctx.auth.user.id
       }).returning();
 
       insertedEdges.push(r);
@@ -254,5 +256,21 @@ export const workflowRouter = createTRPCRouter({
     nodes: insertedNodes,
     edges: insertedEdges,
   };
+    }),
+    updateNodeData:protectedProcedure.input(
+        z.object(
+            {
+                data:z.record(z.string(),z.any().optional()),
+                id:z.string()
+            }
+        )
+    )
+    .mutation(async({ctx,input})=>{
+        await db.update(Node).set({
+            data:input.data
+        }).where(and(
+          eq(Node.userId,ctx.auth.user.id),
+          eq(Node.id,input.id)
+        ))
     })
 })

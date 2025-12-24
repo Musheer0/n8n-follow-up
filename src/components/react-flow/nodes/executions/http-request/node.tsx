@@ -23,7 +23,7 @@ export const HttpRequestNode = memo((props:NodeProps<HttpRequestNodeType>)=>{
     return (
      <>
      <HttpRequestDialog
-     
+      id={props.id}
       open={open}
       onOpenChange={setOpen}
       defaultBody={props.data.body}
