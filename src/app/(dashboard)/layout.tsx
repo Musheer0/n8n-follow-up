@@ -1,6 +1,7 @@
 import AppSidebar from '@/components/app-sidebar';
 import { ThemeProvider } from '@/components/theme-provider';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { Provider } from 'jotai';
 import React from 'react';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
@@ -14,8 +15,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
  <SidebarProvider>
         <AppSidebar/>
         <SidebarInset>
-
-          {children}
+          <Provider>
+            {children}
+          </Provider>
         </SidebarInset>
     </SidebarProvider>
 

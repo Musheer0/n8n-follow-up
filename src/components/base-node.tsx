@@ -1,10 +1,14 @@
 import type { ComponentProps } from "react";
 
 import { cn } from "@/lib/utils";
-
-export function BaseNode({ className, ...props }: ComponentProps<"div">) {
+import { NodeStatusIndicator,type NodeStatus } from "./node-status-indicator";
+type BaseNodeProps = ComponentProps<"div"> & {
+  status?: NodeStatus
+}
+export function   BaseNode({ className,status, ...props }: BaseNodeProps) {
   return (
-    <div
+  <NodeStatusIndicator variant="border" status={status}>
+      <div
       className={cn(
         "bg-card text-card-foreground relative rounded-md border",
         "hover:ring-1",
@@ -20,6 +24,7 @@ export function BaseNode({ className, ...props }: ComponentProps<"div">) {
       tabIndex={0}
       {...props}
     />
+  </NodeStatusIndicator>
   );
 }
 

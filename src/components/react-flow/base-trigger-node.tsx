@@ -1,13 +1,13 @@
 "use client"
 
-import { Handle, NodeProps, Position } from "@xyflow/react"
+import { Handle, NodeProps, Position, useReactFlow } from "@xyflow/react"
 import { LucideIcon } from "lucide-react"
 
 interface BaseTriggerNodeProps extends NodeProps {
     icon:LucideIcon|string,
     name?:string,
     descritpion?:string,
-    status?:boolean,
+    status?:NodeStatus,
     onSettings?:()=>void,
     onDoubleClick?:()=>void,
     children?:React.ReactNode
@@ -17,6 +17,7 @@ interface BaseTriggerNodeProps extends NodeProps {
 import React, { memo } from 'react'
 import { WorkflowNode } from "./workflow-node"
 import { BaseNode, BaseNodeContent } from "../base-node"
+import { NodeStatus } from "../node-status-indicator"
 
 const BaseTriggerNode:React.FC<BaseTriggerNodeProps> = memo((
     {
@@ -30,14 +31,27 @@ const BaseTriggerNode:React.FC<BaseTriggerNodeProps> = memo((
         children
     }
 ) => {
+const {setNodes,setEdges} = useReactFlow();
+const handleDelete = ()=>{
+  setNodes((currenttNodes)=>{
+    const updated_nodes = currenttNodes.filter((n)=>n.id!==id)
+    return updated_nodes
+  });
+  setEdges((currentEdges)=>{
+    const updatedEdges = currentEdges.filter((e)=>e.source!==id && e.target!==id);
+    return updatedEdges
+  })
+}
   return (
+
     <WorkflowNode
     name={name}
     description={descritpion}
-    onDelete={()=>{}}
+    onDelete={handleDelete}
     onSettings={onSettings}
+    showToolbar
     >
-   <BaseNode onDoubleClick={onDoubleClick}
+   <BaseNode status={status} onDoubleClick={onDoubleClick}
    className="rounded-l-2xl relative group"
    >
    <BaseNodeContent>
