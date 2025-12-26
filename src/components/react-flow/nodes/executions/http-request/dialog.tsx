@@ -64,7 +64,7 @@ const HttpRequestDialog = ({
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
   id:string
 }) => {
-  const {getNodes,setNodes} = useReactFlow();
+  const {setNodes} = useReactFlow();
   const updateNode = useUpdateNodeData()
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),

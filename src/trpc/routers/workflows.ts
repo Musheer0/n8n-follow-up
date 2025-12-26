@@ -7,6 +7,7 @@ import { and, desc, eq, ilike, inArray, not, sql } from "drizzle-orm";
 import { PAGINATION } from "@/config/constants";
 import { TRPCError } from "@trpc/server";
 import {Node as RNode,type Edge} from '@xyflow/react'
+import { inngest } from "@/inngest/client";
 export const workflowRouter = createTRPCRouter({
     create: protectedProcedure.input(
         z.object({
@@ -271,5 +272,29 @@ await db.delete(Connection).where(not(inArray(Connection.id,insertedEdges.map((e
           eq(Node.userId,ctx.auth.user.id),
           eq(Node.id,input.id)
         ))
+    }),
+    execute:protectedProcedure.input(
+        z.object({
+            id:z.string()
+        })
+    ).mutation(async({ctx,input})=>{
+        const w = await db.query.workflow.findFirst({
+            where:and(
+                eq(workflow.id,input.id),
+                eq(workflow.userId,ctx.auth.user.id)
+            )
+        });
+        if(!w) throw new TRPCError({
+            code:"NOT_FOUND",
+            message:"workflow not found"
+        })
+        console.log(w)
+        await inngest.send({
+            name:"workflows/execute",
+            data:{
+                 workflowId: w.id,
+    userId: w.userId,
+            }
+        })
     })
 })
