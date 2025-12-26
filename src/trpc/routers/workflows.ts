@@ -3,7 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "../init";
 import db from "@/lib/db";
 import {generateSlug} from 'random-word-slugs'
 import { Connection, Node, NodeTypeDb, NodeTypeTs, workflow} from "../../../drizzle/schema";
-import { and, desc, eq, ilike, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, not, sql } from "drizzle-orm";
 import { PAGINATION } from "@/config/constants";
 import { TRPCError } from "@trpc/server";
 import {Node as RNode,type Edge} from '@xyflow/react'
@@ -185,7 +185,6 @@ export const workflowRouter = createTRPCRouter({
             code:"NOT_FOUND",
             message:"workflow not found"
         });
-        console.log(input)
      const insertedNodes = [];
 
   for (const node of nodes) {
@@ -202,17 +201,17 @@ export const workflowRouter = createTRPCRouter({
 
       insertedNodes.push(r);
     } catch {
-     await db.update(Node).set({
+    const [updated_node] =  await db.update(Node).set({
         name: node.type || "unknown",
         type: (node.type || "manual") as NodeTypeTs,
         position: node.position,
         data: node.data ?? {},
       })
-      .where(eq(Node.id, node.id))
-  
+      .where(eq(Node.id, node.id)).returning()
+       insertedNodes.push(updated_node)
     }
   }
-
+await db.delete(Node).where(not(inArray(Node.id,insertedNodes.map((e)=>e.id))))
   const insertedEdges = [];
 
   for (const edge of edges) {
@@ -228,7 +227,7 @@ export const workflowRouter = createTRPCRouter({
 
       insertedEdges.push(r);
     } catch {
-      await db.update(Connection).set({
+     const [updated_connection] =  await db.update(Connection).set({
         from_output: edge.sourceHandle || "main",
         to_output: edge.targetHandle || "main",
       })
@@ -238,12 +237,12 @@ export const workflowRouter = createTRPCRouter({
           eq(Connection.fromNodeId, edge.source),
           eq(Connection.toNodeId, edge.target)
         )
-      )
-   
+      ).returning()
+     insertedEdges.push(updated_connection)
 
     }
   }
-
+await db.delete(Connection).where(not(inArray(Connection.id,insertedEdges.map((e)=>e.id))))
   const updatedAt = new Date();
 
   await db.update(workflow)
