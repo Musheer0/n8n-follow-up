@@ -6,7 +6,7 @@ import { GlobeIcon } from "lucide-react";
 import { memo, useState } from "react";
 import HttpRequestDialog from "./dialog";
 
-type HttpRequestNodeProps = {
+export type HttpRequestNodeProps = {
     endpoint?:string,
     method?:"GET"|"POST"|"PUT"|"DELETE"|"PATCH";
     body?:string;

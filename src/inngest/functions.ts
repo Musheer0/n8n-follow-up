@@ -2,6 +2,7 @@ import { NonRetriableError } from "inngest";
 import { inngest } from "./client";
 import db from "@/lib/db";
 import { TopologicalSort } from "./utils";
+import { getExecutor } from "@/features/executors/executor-registry";
 
 export const executeWorflow = inngest.createFunction(
   {id:"execute-workflow"},
@@ -31,7 +32,16 @@ const [nodes, edges] = await step.run("prepare workflow", async () => {
 
   return [nodes, edges] as const;
 });
-  const sortedNodes = TopologicalSort(nodes.map((e)=>({...e,updatedAt:new Date(e.updatedAt)})),edges.map((e)=>({...e,updatedAt:new Date(e.updatedAt)})))
-  return sortedNodes
+  const sortedNodes = TopologicalSort(nodes.map((e)=>({...e,updatedAt:new Date(e.updatedAt)})),edges.map((e)=>({...e,updatedAt:new Date(e.updatedAt)})));
+  let context = event.data.initialData || {};
+  for (const n of sortedNodes){
+    const executor = getExecutor(n.type);
+    context = await executor({
+      node:n,
+      context,
+      step,
+    })
+  }
+  return {sortedNodes}
   }
 )

@@ -26,6 +26,5 @@ export const TopologicalSort = (nodes:InferSelectModel<typeof Node>[],connection
         throw error;
     }
     const nodeMap = new Map(nodes.map((n)=>[n.id,n]));
-    console.log({nodeMap,sotedNodes})
     return sotedNodes.map((e)=>nodeMap.get(e)!).filter(Boolean)
 }
