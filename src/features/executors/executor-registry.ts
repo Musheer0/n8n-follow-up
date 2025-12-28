@@ -12,6 +12,5 @@ export const executors:Record<string&NodeTypeTs,NodeExecutor> = {
 
 export const getExecutor = (type:NodeTypeTs)=>{
     const executor = executors[type];
-    if(!executor) throw new Error("No executor found for node type "+type);
-    return executor
+    if(!executor) throw new Error("No executor found for node type "+type);    return executor
 }

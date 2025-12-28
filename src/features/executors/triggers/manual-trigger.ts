@@ -5,6 +5,6 @@ export const ManualTriggerExecutor:NodeExecutor  = async({
     node,
     step
 })=>{
-    const result = await step.run("mannual-trigger",async()=>context);
+    const result = await step.run("manual-trigger",async()=>context);
     return result
 }

@@ -212,8 +212,14 @@ export const workflowRouter = createTRPCRouter({
        insertedNodes.push(updated_node)
     }
   }
-await db.delete(Node).where(not(inArray(Node.id,insertedNodes.map((e)=>e.id))))
-  const insertedEdges = [];
+await db.delete(Node).where(
+  and(
+    eq(Node.workflow_id, id),
+    eq(Node.userId, ctx.auth.user.id),
+    not(inArray(Node.id, insertedNodes.map((e) => e.id)))
+  )
+) 
+ const insertedEdges = [];
 
   for (const edge of edges) {
     try {
@@ -243,7 +249,13 @@ await db.delete(Node).where(not(inArray(Node.id,insertedNodes.map((e)=>e.id))))
 
     }
   }
-await db.delete(Connection).where(not(inArray(Connection.id,insertedEdges.map((e)=>e.id))))
+await db.delete(Connection).where(
+  and(
+    eq(Connection.workflow_id, id),
+    eq(Connection.userId, ctx.auth.user.id),
+    not(inArray(Connection.id, insertedEdges.map((e) => e.id)))
+  )
+)
   const updatedAt = new Date();
 
   await db.update(workflow)

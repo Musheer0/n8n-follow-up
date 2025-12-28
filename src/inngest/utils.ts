@@ -15,10 +15,10 @@ export const TopologicalSort = (nodes:InferSelectModel<typeof Node>[],connection
             edges.push([node.id,node.id]);
         }
     }
-    let sotedNodes:string[];
+    let sortedNodes:string[];
     try {
-        sotedNodes = toposort(edges);
-        sotedNodes = [...new Set(sotedNodes)];
+        sortedNodes = toposort(edges);
+        sortedNodes = [...new Set(sortedNodes)];
     } catch (error) {
         if(error instanceof Error && error.message.includes("Cyclic")){
             throw new Error("workflow contains a cycle");
@@ -26,5 +26,5 @@ export const TopologicalSort = (nodes:InferSelectModel<typeof Node>[],connection
         throw error;
     }
     const nodeMap = new Map(nodes.map((n)=>[n.id,n]));
-    return sotedNodes.map((e)=>nodeMap.get(e)!).filter(Boolean)
+    return sortedNodes.map((e)=>nodeMap.get(e)!).filter(Boolean)
 }

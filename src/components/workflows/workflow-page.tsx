@@ -69,7 +69,7 @@ const Editor = ({id}:{id:string}) => {
           <Panel>
             <AddNodeButoon/>
           </Panel>
-          {data.nodes.map((e)=>e.type==="manual").length>0 &&
+          {data.nodes.some((e)=>e.type==="manual") &&
           <Panel position='bottom-center'>
             <ExecuteWorkflowButton id={data.id}/>
           </Panel>
