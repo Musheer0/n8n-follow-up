@@ -16,6 +16,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -45,6 +46,7 @@ const formSchema = z.object({
   endpoint: z.string().url("Enter a valid URL"),
   method: z.enum(["GET", "POST", "PUT", "PATCH", "DELETE"]),
   body: z.string().optional(),
+  variableName:z.string().regex(/^[A-Za-z0-9_]+$/,{message:"variable name can only contain aplhabets numbers and _"})
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -55,7 +57,8 @@ const HttpRequestDialog = ({
   defaultEndpoint = "",
   defaultBody = "",
   method = "GET",
-  id
+  id,
+
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -76,7 +79,7 @@ const HttpRequestDialog = ({
   })
 
   const selectedMethod = form.watch("method")
-
+  const watch_variable = form.watch("variableName")
   async function onSubmit(values: FormValues) {
 
     try {
@@ -121,6 +124,25 @@ onOpenChange(false)
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-4"
           >
+             {/* Variable Name */}
+            <FormField
+              control={form.control}
+              name="variableName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Variable name</FormLabel>
+                  <FormDescription>{`{{${watch_variable}.http.data}}}`}</FormDescription>
+                  <FormControl>
+                    <Input
+                      placeholder="myapi"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             {/* Endpoint */}
             <FormField
               control={form.control}

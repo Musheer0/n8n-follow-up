@@ -42,6 +42,6 @@ const [nodes, edges] = await step.run("prepare workflow", async () => {
       step,
     })
   }
-  return {sortedNodes}
+  return {context}
   }
 )

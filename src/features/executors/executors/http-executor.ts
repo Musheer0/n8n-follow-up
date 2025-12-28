@@ -5,7 +5,7 @@ type HttpRequest ={
      endpoint?:string,
     method?:"GET"|"POST"|"PUT"|"DELETE"|"PATCH";
     body?:string;
-
+  variableName?:string
 }
 export const HttpExecutor:NodeExecutor  = async({
     context,
@@ -16,6 +16,7 @@ export const HttpExecutor:NodeExecutor  = async({
     const data = node.data as HttpRequest
     const result = await step.run("http-execution",async()=>{
         if(!data.endpoint) throw new NonRetriableError("Http node is not configured ");
+                if(!data.variableName) throw new NonRetriableError("Http node variable name   is not configured ");
       const endpoint = data.endpoint;
       const method = data.method||"GET";
       const options:Options = {method}
@@ -46,10 +47,12 @@ const responseData = contentType.includes("application/json")
   : await response.text();
       return {
         ...context,
-        httpResponse:{
+        [data.variableName]:{
+            http:{
             status:response.status,
             statusText:response.statusText,
             data:responseData
+        }
         }
       }
     });
