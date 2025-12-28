@@ -20,6 +20,7 @@ import { nodeComponents } from '@/config/node-components';
 import AddNodeButoon from '../react-flow/add-node-button';
 import { useSetAtom } from 'jotai';
 import { editorAtom } from '@/features/editor/store/atom';
+import ExecuteWorkflowButton from '../execute-workflow-btn';
 
 const Editor = ({id}:{id:string}) => {
     const {data} = useSuspenseWorkflow(id);
@@ -68,6 +69,11 @@ const Editor = ({id}:{id:string}) => {
           <Panel>
             <AddNodeButoon/>
           </Panel>
+          {data.nodes.some((e)=>e.type==="manual") &&
+          <Panel position='bottom-center'>
+            <ExecuteWorkflowButton id={data.id}/>
+          </Panel>
+          }
         </ReactFlow>
     </div>
   )

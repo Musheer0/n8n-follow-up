@@ -25,3 +25,8 @@ export const useUpdateWorkflow = ()=>{
         
     )
 }
+
+export const useExecuteWorkflow = ()=>{
+    const trpc = useTRPC();
+    return useMutation(trpc.workflow.execute.mutationOptions({}))
+}

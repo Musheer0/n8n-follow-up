@@ -3,10 +3,11 @@ import { createTRPCRouter, protectedProcedure } from "../init";
 import db from "@/lib/db";
 import {generateSlug} from 'random-word-slugs'
 import { Connection, Node, NodeTypeDb, NodeTypeTs, workflow} from "../../../drizzle/schema";
-import { and, desc, eq, ilike, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, not, sql } from "drizzle-orm";
 import { PAGINATION } from "@/config/constants";
 import { TRPCError } from "@trpc/server";
 import {Node as RNode,type Edge} from '@xyflow/react'
+import { inngest } from "@/inngest/client";
 export const workflowRouter = createTRPCRouter({
     create: protectedProcedure.input(
         z.object({
@@ -185,7 +186,6 @@ export const workflowRouter = createTRPCRouter({
             code:"NOT_FOUND",
             message:"workflow not found"
         });
-        console.log(input)
      const insertedNodes = [];
 
   for (const node of nodes) {
@@ -202,18 +202,24 @@ export const workflowRouter = createTRPCRouter({
 
       insertedNodes.push(r);
     } catch {
-     await db.update(Node).set({
+    const [updated_node] =  await db.update(Node).set({
         name: node.type || "unknown",
         type: (node.type || "manual") as NodeTypeTs,
         position: node.position,
         data: node.data ?? {},
       })
-      .where(eq(Node.id, node.id))
-  
+      .where(eq(Node.id, node.id)).returning()
+       insertedNodes.push(updated_node)
     }
   }
-
-  const insertedEdges = [];
+await db.delete(Node).where(
+  and(
+    eq(Node.workflow_id, id),
+    eq(Node.userId, ctx.auth.user.id),
+    not(inArray(Node.id, insertedNodes.map((e) => e.id)))
+  )
+) 
+ const insertedEdges = [];
 
   for (const edge of edges) {
     try {
@@ -228,7 +234,7 @@ export const workflowRouter = createTRPCRouter({
 
       insertedEdges.push(r);
     } catch {
-      await db.update(Connection).set({
+     const [updated_connection] =  await db.update(Connection).set({
         from_output: edge.sourceHandle || "main",
         to_output: edge.targetHandle || "main",
       })
@@ -238,12 +244,18 @@ export const workflowRouter = createTRPCRouter({
           eq(Connection.fromNodeId, edge.source),
           eq(Connection.toNodeId, edge.target)
         )
-      )
-   
+      ).returning()
+     insertedEdges.push(updated_connection)
 
     }
   }
-
+await db.delete(Connection).where(
+  and(
+    eq(Connection.workflow_id, id),
+    eq(Connection.userId, ctx.auth.user.id),
+    not(inArray(Connection.id, insertedEdges.map((e) => e.id)))
+  )
+)
   const updatedAt = new Date();
 
   await db.update(workflow)
@@ -272,5 +284,29 @@ export const workflowRouter = createTRPCRouter({
           eq(Node.userId,ctx.auth.user.id),
           eq(Node.id,input.id)
         ))
+    }),
+    execute:protectedProcedure.input(
+        z.object({
+            id:z.string()
+        })
+    ).mutation(async({ctx,input})=>{
+        const w = await db.query.workflow.findFirst({
+            where:and(
+                eq(workflow.id,input.id),
+                eq(workflow.userId,ctx.auth.user.id)
+            )
+        });
+        if(!w) throw new TRPCError({
+            code:"NOT_FOUND",
+            message:"workflow not found"
+        })
+        console.log(w)
+        await inngest.send({
+            name:"workflows/execute",
+            data:{
+                 workflowId: w.id,
+    userId: w.userId,
+            }
+        })
     })
 })
