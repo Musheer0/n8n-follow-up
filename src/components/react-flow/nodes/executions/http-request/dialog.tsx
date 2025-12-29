@@ -58,6 +58,7 @@ const HttpRequestDialog = ({
   defaultBody = "",
   method = "GET",
   id,
+  variableName
 
 }: {
   open: boolean
@@ -65,7 +66,8 @@ const HttpRequestDialog = ({
   defaultEndpoint?: string
   defaultBody?: string
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
-  id:string
+  id:string,
+  variableName?:string
 }) => {
   const {setNodes} = useReactFlow();
   const updateNode = useUpdateNodeData()
@@ -75,6 +77,7 @@ const HttpRequestDialog = ({
       endpoint: defaultEndpoint,
       body: defaultBody,
       method,
+      variableName:variableName
     },
   })
 

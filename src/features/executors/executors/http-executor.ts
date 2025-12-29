@@ -1,6 +1,8 @@
 import { NonRetriableError } from "inngest";
 import { NodeExecutor } from "../types";
 import ky ,{HTTPError, type Options} from 'ky'
+import handlebars from 'handlebars'
+handlebars.registerHelper("json",(ctx)=>new handlebars.SafeString(JSON.stringify(ctx,null,2)))
 type HttpRequest ={
      endpoint?:string,
     method?:"GET"|"POST"|"PUT"|"DELETE"|"PATCH";
@@ -17,11 +19,13 @@ export const HttpExecutor:NodeExecutor  = async({
     const result = await step.run("http-execution",async()=>{
         if(!data.endpoint) throw new NonRetriableError("Http node is not configured ");
                 if(!data.variableName) throw new NonRetriableError("Http node variable name   is not configured ");
-      const endpoint = data.endpoint;
+      const endpoint = handlebars.compile(data.endpoint)(context);
+      console.log({endpoint})
       const method = data.method||"GET";
       const options:Options = {method}
       if(!["GET","DELETE"].includes(method)){
-            options.body = data.body
+        const resolved = handlebars.compile(data.body||{})(context)
+            options.body = resolved
       };
            let response;
       try {
@@ -30,12 +34,14 @@ export const HttpExecutor:NodeExecutor  = async({
         if (error instanceof HTTPError) {
           return {
             ...context,
-            httpResponse: {
+            [data.variableName]:{
+                http: {
               status: error.response.status,
               statusText: error.response.statusText,
               data: null,
               error: true,
             },
+            }
           };
         }
         throw error;

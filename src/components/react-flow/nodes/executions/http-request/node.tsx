@@ -30,6 +30,7 @@ export const HttpRequestNode = memo((props:NodeProps<HttpRequestNodeType>)=>{
       defaultBody={props.data.body}
       method={props.data.method}
       defaultEndpoint={props.data.endpoint}
+      variableName={props.data.variableName}
      />
       <BaseExecutionNode
       {...props}
