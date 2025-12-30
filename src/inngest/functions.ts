@@ -3,10 +3,15 @@ import { inngest } from "./client";
 import db from "@/lib/db";
 import { TopologicalSort } from "./utils";
 import { getExecutor } from "@/features/executors/executor-registry";
+import { httpChannel } from "./channels";
 export const executeWorflow = inngest.createFunction(
-  {id:"execute-workflow"},
-  {event:"workflows/execute"},
-  async({event,step})=>{
+  {id:"execute-workflow",retries:0},
+  {event:"workflows/execute",
+    channels:[
+      httpChannel()
+    ]
+  },
+  async({event,step,publish})=>{
    const { workflowId, userId }= event.data;
 if (!workflowId || !userId) {
   throw new NonRetriableError("Missing workflowId or userId");
@@ -39,6 +44,7 @@ const [nodes, edges] = await step.run("prepare workflow", async () => {
       node:n,
       context,
       step,
+      publish
     })
   }
   return {context}
